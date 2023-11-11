@@ -152,6 +152,31 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  List<DataRow> getUserUsageData() {
+    return (
+        <DataRow>[
+          DataRow(
+            cells: <DataCell>[
+              DataCell(Text('Sarah')),
+              DataCell(Text('19')),
+            ],
+          ),
+          DataRow(
+            cells: <DataCell>[
+              DataCell(Text('Janine')),
+              DataCell(Text('43')),
+            ],
+          ),
+          DataRow(
+            cells: <DataCell>[
+              DataCell(Text('William')),
+              DataCell(Text('27')),
+            ],
+          ),
+        ]
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -193,26 +218,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ],
-              rows: const <DataRow>[
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('Sarah')),
-                    DataCell(Text('19')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('Janine')),
-                    DataCell(Text('43')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('William')),
-                    DataCell(Text('27')),
-                  ],
-                ),
-              ],
+              rows: getUserUsageData(),
             ),
           ],
         ),
