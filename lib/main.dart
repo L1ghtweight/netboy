@@ -76,11 +76,14 @@ class _MyHomePageState extends State<MyHomePage> {
       existingData = json.decode(fileContent);
     }
 
-    // Append new data
-    existingData.add({'id': id, 'password': password});
+    dynamic userCreds = {'id': id, 'password': password};
 
-    // Write the updated content back to the file
-    credsFile.writeAsStringSync(json.encode(existingData));
+    // Append new data
+    if(!existingData.contains(userCreds)) {
+      existingData.add(userCreds);
+      // Write the updated content back to the file
+      credsFile.writeAsStringSync(json.encode(existingData));
+    }
   }
 
   void showAddIDDialog(BuildContext context) {
@@ -91,21 +94,21 @@ class _MyHomePageState extends State<MyHomePage> {
         TextEditingController passwordController = TextEditingController();
 
         return AlertDialog(
-          title: Text('Add New User'),
+          title: const Text('Add New User'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: idController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Enter ID',
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               TextField(
                 controller: passwordController,
                 obscureText: true,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Enter Password',
                 ),
               ),
@@ -116,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.pop(context); // Close the dialog box
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
@@ -130,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 // Close the dialog box
                 Navigator.pop(context);
               },
-              child: Text('Add'),
+              child: const Text('Add'),
             ),
           ],
         );
@@ -151,25 +154,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
 
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
             tooltip: 'Add ID',
             onPressed: () {
               // Add button functionality here
@@ -179,30 +171,48 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'Add ID credentials to view stats',
-            ),
-            Text(
-              'EMPTY TABLE',
-              style: Theme.of(context).textTheme.headlineMedium,
+            DataTable(
+              columns: const <DataColumn>[
+                DataColumn(
+                  label: Expanded(
+                    child: Text(
+                      'Username',
+                      style: TextStyle(fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                ),
+                DataColumn(
+                  label: Expanded(
+                    child: Text(
+                      'Usage',
+                      style: TextStyle(fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                ),
+              ],
+              rows: const <DataRow>[
+                DataRow(
+                  cells: <DataCell>[
+                    DataCell(Text('Sarah')),
+                    DataCell(Text('19')),
+                  ],
+                ),
+                DataRow(
+                  cells: <DataCell>[
+                    DataCell(Text('Janine')),
+                    DataCell(Text('43')),
+                  ],
+                ),
+                DataRow(
+                  cells: <DataCell>[
+                    DataCell(Text('William')),
+                    DataCell(Text('27')),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
