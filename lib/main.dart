@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'dart:convert';
 
-void main() {
+import 'package:path_provider/path_provider.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -11,6 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'NetBoy',
       theme: ThemeData(
         // This is the theme of your application.
@@ -28,7 +34,7 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'NetBoy'),
@@ -55,16 +61,91 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  Future<void> appendToCredsFile(String id, String password) async {
+    // Get the application documents directory
+    Directory appDocumentsDirectory = await getApplicationDocumentsDirectory();
 
-  void _incrementCounter() {
+    // Construct the file path for the credentials file
+    String filePath = '${appDocumentsDirectory.path}/creds.json';
+    File credsFile = File(filePath);
+
+    // Read existing content or create an empty list
+    List<dynamic> existingData = [];
+    if (credsFile.existsSync()) {
+      String fileContent = credsFile.readAsStringSync();
+      existingData = json.decode(fileContent);
+    }
+
+    // Append new data
+    existingData.add({'id': id, 'password': password});
+
+    // Write the updated content back to the file
+    credsFile.writeAsStringSync(json.encode(existingData));
+  }
+
+  void showAddIDDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController idController = TextEditingController();
+        TextEditingController passwordController = TextEditingController();
+
+        return AlertDialog(
+          title: Text('Add New User'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: idController,
+                decoration: InputDecoration(
+                  hintText: 'Enter ID',
+                ),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  hintText: 'Enter Password',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog box
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Process the entered ID and password
+                String id = idController.text;
+                String password = passwordController.text;
+
+                // Append to the creds.json file
+                appendToCredsFile(id, password);
+
+                // Close the dialog box
+                Navigator.pop(context);
+              },
+              child: Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void fetchData() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      _counter++;
+      //call function that fetches data from net.iut-dhaka.edu
     });
   }
 
@@ -85,6 +166,17 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            tooltip: 'Add ID',
+            onPressed: () {
+              // Add button functionality here
+              showAddIDDialog(context);
+            },
+          ),
+        ],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -106,19 +198,21 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'You have pushed the button this many times:',
+              'Add ID credentials to view stats',
             ),
             Text(
-              '$_counter',
+              'EMPTY TABLE',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        onPressed: () {
+          //TODO
+        },
+        tooltip: 'Refresh',
+        child: const Icon(Icons.sync),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
