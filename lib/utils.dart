@@ -7,15 +7,23 @@ Future<int> getUsage(String username, String password) async {
   final headers = {"Content-Type": "application/x-www-form-urlencoded"};
 
   try {
-    final response = await Requests.post(
+    var response = await Requests.post(
       loginUrl,
       headers: headers,
-      body: {'username': username, 'password': password},
+      body: payload,
+      verify: true,
+    );
+
+    response = await Requests.post(
+      loginUrl,
+      headers: headers,
+      body: payload,
       verify: true,
     );
 
     int usageMinutes = getParsedUsage(response.content());
 
+    // print(response.content());
     print(usageMinutes);
     return usageMinutes;
   } on Exception catch (e) {
