@@ -23,7 +23,6 @@ Future<int> getUsage(String username, String password) async {
 
     int usageMinutes = getParsedUsage(response.content());
 
-    // print(response.content());
     print(usageMinutes);
     return usageMinutes;
   } on Exception catch (e) {
@@ -39,7 +38,7 @@ int getParsedUsage(String body) {
   final rows = tableBody?.querySelectorAll("tr");
 
   List<List<String>> usageData = [];
-  var extractedUsageData = 0;
+  var extractedUsageData = -1;
 
   if (rows != null) {
     for (var row in rows) {
