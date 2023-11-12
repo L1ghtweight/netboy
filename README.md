@@ -1,6 +1,6 @@
 # netboy
 
-Offspring of netman
+Offspring of [netman](https://github.com/L1ghtweight/netman)
 
 ## Getting Started
 
