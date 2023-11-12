@@ -39,6 +39,7 @@ dependencies:
   html: ^0.15.3
   web_scraper: ^0.1.4
   dotenv: ^4.2.0
+  requests: ^4.7.0
 
 dev_dependencies:
   flutter_test:
