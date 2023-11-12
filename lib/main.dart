@@ -4,6 +4,10 @@ import 'dart:convert';
 
 import 'package:path_provider/path_provider.dart';
 
+import 'package:http/http.dart' as http;
+import 'package:html/parser.dart' as htmlParser;
+import 'package:html/dom.dart' as html;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
@@ -61,6 +65,102 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Future<int> getUsage(String user, String pass) async {
+    String loginUrl = "http://10.220.20.12/index.php/home/loginProcess";
+
+    var payload = "username=$user&password=$pass";
+
+    Map<String, String> headers = {
+      "Accept": "*/*",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Connection": "keep-alive",
+      "Content-Type": "application/x-www-form-urlencoded",
+    };
+
+    try {
+      http.Response response = await http.post(
+        Uri.parse(loginUrl),
+        headers: headers,
+        body: payload,
+      ).timeout(const Duration(seconds: 10));
+
+      // Check the response status code
+      print(response.statusCode);
+      print(response.headers);
+      print(response.body);
+    } catch (e) {
+      // Handle network or other errors
+      print("Error during login: $e");
+    }
+    return 0;
+  }
+
+  Future<int> __getUsage(String username, String password) async {
+    final session = http.Client();
+
+    try {
+      final headers = {"Content-Type": "application/x-www-form-urlencoded"};
+
+      String data = "username=$username&password=$password";
+
+      print(data);
+
+      final response = await session.post(
+          Uri.parse("http://10.220.20.12/index.php/home/login"),
+          headers: headers,
+          body: data).timeout(const Duration(seconds: 10));
+      print(response.headers);
+      print(response.body);
+
+      return 0;
+    } finally {
+      session.close();
+    }
+  }
+
+  Future<int> _getUsage(String username, String password) async {
+    final session = http.Client();
+
+    try {
+      final headers = {"Content-Type": "application/x-www-form-urlencoded"};
+
+      String data = "username=$username&password=$password";
+
+      print(data);
+
+      final response = await session.post(
+          Uri.parse("http://10.220.20.12/index.php/home/login"),
+          headers: headers,
+          body: data);
+
+      print(response.body);
+
+      final document = htmlParser.parse(response.body);
+
+      final table = document.querySelector("table.table.invoicefor");
+      final tableBody = table?.querySelector("tbody");
+      final rows = tableBody?.querySelectorAll("tr");
+
+      List<List<String>> usageData = [];
+      var extractedUsageData = 0;
+
+      if (rows != null) {
+        for (var row in rows) {
+          final cols = row.querySelectorAll("td");
+          final colsText = cols.map((col) => col.text.trim()).toList();
+          usageData.add(colsText);
+        }
+
+        extractedUsageData =
+            int.parse(usageData[5][1].replaceAll(' Minute', '').trim());
+      }
+
+      return extractedUsageData;
+    } finally {
+      session.close();
+    }
+  }
+
   Future<void> appendToCredsFile(String id, String password) async {
     // Get the application documents directory
     Directory appDocumentsDirectory = await getApplicationDocumentsDirectory();
@@ -79,7 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
     dynamic userCreds = {'id': id, 'password': password};
 
     // Append new data
-    if(!existingData.contains(userCreds)) {
+    if (!existingData.contains(userCreds)) {
       existingData.add(userCreds);
       // Write the updated content back to the file
       credsFile.writeAsStringSync(json.encode(existingData));
@@ -153,28 +253,26 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   List<DataRow> getUserUsageData() {
-    return (
-        <DataRow>[
-          DataRow(
-            cells: <DataCell>[
-              DataCell(Text('Sarah')),
-              DataCell(Text('19')),
-            ],
-          ),
-          DataRow(
-            cells: <DataCell>[
-              DataCell(Text('Janine')),
-              DataCell(Text('43')),
-            ],
-          ),
-          DataRow(
-            cells: <DataCell>[
-              DataCell(Text('William')),
-              DataCell(Text('27')),
-            ],
-          ),
-        ]
-    );
+    return (<DataRow>[
+      DataRow(
+        cells: <DataCell>[
+          DataCell(Text('Sarah')),
+          DataCell(Text('19')),
+        ],
+      ),
+      DataRow(
+        cells: <DataCell>[
+          DataCell(Text('Janine')),
+          DataCell(Text('43')),
+        ],
+      ),
+      DataRow(
+        cells: <DataCell>[
+          DataCell(Text('William')),
+          DataCell(Text('27')),
+        ],
+      ),
+    ]);
   }
 
   @override
@@ -183,7 +281,6 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
-
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -224,8 +321,10 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          //TODO
+        onPressed: () async {
+          const _username = "write user name";
+          const _pass = "write password";
+          print(await __getUsage(_username, _pass));
         },
         tooltip: 'Refresh',
         child: const Icon(Icons.sync),
