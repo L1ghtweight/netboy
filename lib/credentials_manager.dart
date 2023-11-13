@@ -87,14 +87,14 @@ class _CredentialsManagerState extends State<CredentialsManager> {
     );
   }
 
-  void editCredsDialog(BuildContext context, int index) {
+  void editCredsDialog(BuildContext context, int _index) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         TextEditingController idController =
-            TextEditingController(text: credsData[index][0]);
+            TextEditingController(text: credsData[_index][0]);
         TextEditingController passwordController =
-            TextEditingController(text: credsData[index][1]);
+            TextEditingController(text: credsData[_index][1]);
 
         return AlertDialog(
           title: const Text('Edit Net ID'),
@@ -119,6 +119,16 @@ class _CredentialsManagerState extends State<CredentialsManager> {
           actions: [
             TextButton(
               onPressed: () {
+                setState(() {
+                  credsData.removeAt(_index);
+                });
+                updateCredsFile(credsData);
+                Navigator.pop(context); // Close the dialog box
+              },
+              child: const Text('Remove'),
+            ),
+            TextButton(
+              onPressed: () {
                 Navigator.pop(context); // Close the dialog box
               },
               child: const Text('Cancel'),
@@ -129,7 +139,7 @@ class _CredentialsManagerState extends State<CredentialsManager> {
                 String id = idController.text;
                 String password = passwordController.text;
                 setState(() {
-                  credsData[index] = [id, password];
+                  credsData[_index] = [id, password];
                 });
 
                 updateCredsFile(credsData);
