@@ -34,14 +34,3 @@ Future<List<List<String>>> readCredsFile() async {
 
   return credsList;
 }
-
-List<List<String>> getCredsData() {
-  List<List<String>> credentials;// = readCredsFile();
-  
-  credentials = [
-    ['arsawerw', 'qerqfv32423'],
-    ['arsawerw', 'qerqfv32423'],
-    ['arsawerw', 'qerqfv32423'],
-  ];
-  return credentials;
-}
