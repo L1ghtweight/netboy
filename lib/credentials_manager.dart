@@ -11,7 +11,21 @@ class CredentialsManager extends StatefulWidget {
 }
 
 class _CredentialsManagerState extends State<CredentialsManager> {
-  List<List<String>> credsData = getCredsData();
+  List<List<String>> credsData = [];
+
+  @override
+  void initState() {
+    super.initState();
+    initializeData();
+  }
+
+  Future<void> initializeData() async {
+    List<List<String>> data = await readCredsFile();
+    setState(() {
+      credsData = data;
+    });
+  }
+
   void showAddIDDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -54,12 +68,14 @@ class _CredentialsManagerState extends State<CredentialsManager> {
                 String password = passwordController.text;
 
                 // Append to the creds.json file
-                appendToCredsFile(id, password);
 
                 setState(() {
-                  credsData.add([id, password]);
+                  if (credsData.contains([id, password]) == false) {
+                    credsData.add([id, password]);
+                  }
                 });
 
+                updateCredsFile(credsData);
                 // Close the dialog box
                 Navigator.pop(context);
               },
@@ -115,6 +131,8 @@ class _CredentialsManagerState extends State<CredentialsManager> {
                 setState(() {
                   credsData[index] = [id, password];
                 });
+
+                updateCredsFile(credsData);
 
                 // Close the dialog box
                 Navigator.pop(context);
