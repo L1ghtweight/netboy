@@ -47,7 +47,6 @@ class _CredentialsManagerState extends State<CredentialsManager> {
               const SizedBox(height: 10),
               TextField(
                 controller: passwordController,
-                obscureText: true,
                 decoration: const InputDecoration(
                   hintText: 'Enter Password',
                 ),
@@ -183,7 +182,7 @@ class _CredentialsManagerState extends State<CredentialsManager> {
                         DataCell(Text(entry.value[1])),
                         DataCell(
                           IconButton(
-                            icon: Icon(Icons.edit),
+                            icon: const Icon(Icons.edit),
                             onPressed: () {
                               // Handle edit button click
                               // Pass the index of the pressed row

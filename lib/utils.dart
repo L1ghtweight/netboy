@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:html/parser.dart' as html;
 import 'package:requests/requests.dart';
 
-Future<int> getUsage(String username, String password) async {
+import 'file_io_handler.dart';
+
+Future<String> getUsage(String username, String password) async {
   const loginUrl = "http://10.220.20.12/index.php/home/loginProcess";
   final payload = {'username': username, 'password': password};
   final headers = {"Content-Type": "application/x-www-form-urlencoded"};
@@ -25,7 +27,7 @@ Future<int> getUsage(String username, String password) async {
     int usageMinutes = getParsedUsage(response.content());
 
     print(usageMinutes);
-    return usageMinutes;
+    return usageMinutes.toString();
   } on Exception catch (e) {
     print("Request Exception: $e");
     rethrow;
@@ -55,25 +57,16 @@ int getParsedUsage(String body) {
   return extractedUsageData;
 }
 
-List<DataRow> getUserUsageData() {
-  return (<DataRow>[
-    DataRow(
-      cells: <DataCell>[
-        DataCell(Text('Sarah')),
-        DataCell(Text('19')),
-      ],
-    ),
-    const DataRow(
-      cells: <DataCell>[
-        DataCell(Text('Janine')),
-        DataCell(Text('43')),
-      ],
-    ),
-    const DataRow(
-      cells: <DataCell>[
-        DataCell(Text('William')),
-        DataCell(Text('27')),
-      ],
-    ),
-  ]);
+Future<List<List<String>>> getUserUsageData() async {
+  List<List<String>> credentials = await readCredsFile();
+  List<List<String>> usageData = [];
+  for (var credential in credentials) {
+    var username = credential[0];
+    var password = credential[1];
+    var usage = await getUsage(username, password);
+    if (usageData.contains([username, usage]) == false) {
+      usageData.add([username, usage]);
+    }
+  }
+  return usageData;
 }

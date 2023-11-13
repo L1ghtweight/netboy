@@ -37,14 +37,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  List<List<String>> usageData = [];
+  @override
+  void initState() {
+    super.initState();
+    fetchUsageData();
+  }
 
-  void fetchData() {
+  Future<void> fetchUsageData() async {
+    List<List<String>> data = await getUserUsageData();
     setState(() {
-      //call function that fetches data from net.iut-dhaka.edu
+      usageData = data;
     });
   }
 
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,20 +97,25 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ],
-              rows: getUserUsageData(),
+              rows: usageData
+                  .asMap()
+                  .entries
+                  .map(
+                    (entry) => DataRow(
+                      cells: [
+                        DataCell(Text(entry.value[0])),
+                        DataCell(Text(entry.value[1])),
+                      ],
+                    ),
+                  )
+                  .toList(),
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          var env = DotEnv(includePlatformEnvironment: true)..load();
-          var username = env['USERNAME'];
-          var password = env['PASSWORD'];
-
-          if (username != null && password != null) {
-            getUsage(username, password);
-          }
+          fetchUsageData();
         },
         tooltip: 'Refresh',
         child: const Icon(Icons.sync),
