@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:html/parser.dart' as html;
 import 'package:requests/requests.dart';
 
@@ -52,4 +53,27 @@ int getParsedUsage(String body) {
   }
 
   return extractedUsageData;
+}
+
+List<DataRow> getUserUsageData() {
+  return (<DataRow>[
+    DataRow(
+      cells: <DataCell>[
+        DataCell(Text('Sarah')),
+        DataCell(Text('19')),
+      ],
+    ),
+    const DataRow(
+      cells: <DataCell>[
+        DataCell(Text('Janine')),
+        DataCell(Text('43')),
+      ],
+    ),
+    const DataRow(
+      cells: <DataCell>[
+        DataCell(Text('William')),
+        DataCell(Text('27')),
+      ],
+    ),
+  ]);
 }

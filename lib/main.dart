@@ -1,11 +1,8 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:dotenv/dotenv.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 
-import 'utils.dart' as utils;
+import 'utils.dart';
+import 'credentials_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,85 +37,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Future<void> appendToCredsFile(String id, String password) async {
-    // Get the application documents directory
-    Directory appDocumentsDirectory = await getApplicationDocumentsDirectory();
-
-    // Construct the file path for the credentials file
-    String filePath = '${appDocumentsDirectory.path}/creds.json';
-    File credsFile = File(filePath);
-
-    // Read existing content or create an empty list
-    List<dynamic> existingData = [];
-    if (credsFile.existsSync()) {
-      String fileContent = credsFile.readAsStringSync();
-      existingData = json.decode(fileContent);
-    }
-
-    dynamic userCreds = {'id': id, 'password': password};
-
-    // Append new data
-    if (!existingData.contains(userCreds)) {
-      existingData.add(userCreds);
-      // Write the updated content back to the file
-      credsFile.writeAsStringSync(json.encode(existingData));
-    }
-  }
-
-  void showAddIDDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        TextEditingController idController = TextEditingController();
-        TextEditingController passwordController = TextEditingController();
-
-        return AlertDialog(
-          title: const Text('Add New User'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: idController,
-                decoration: const InputDecoration(
-                  hintText: 'Enter ID',
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  hintText: 'Enter Password',
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Close the dialog box
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                // Process the entered ID and password
-                String id = idController.text;
-                String password = passwordController.text;
-
-                // Append to the creds.json file
-                appendToCredsFile(id, password);
-
-                // Close the dialog box
-                Navigator.pop(context);
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   void fetchData() {
     setState(() {
@@ -126,29 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  List<DataRow> getUserUsageData() {
-    return (<DataRow>[
-      const DataRow(
-        cells: <DataCell>[
-          DataCell(Text('Sarah')),
-          DataCell(Text('19')),
-        ],
-      ),
-      const DataRow(
-        cells: <DataCell>[
-          DataCell(Text('Janine')),
-          DataCell(Text('43')),
-        ],
-      ),
-      const DataRow(
-        cells: <DataCell>[
-          DataCell(Text('William')),
-          DataCell(Text('27')),
-        ],
-      ),
-    ]);
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -157,11 +53,17 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
-            tooltip: 'Add ID',
+            icon: const Icon(Icons.edit),
+            tooltip: 'Add or Edit ID',
             onPressed: () {
-              // Add button functionality here
-              showAddIDDialog(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CredentialsManager(
+                    title: 'Add or Edit credentials',
+                  ),
+                ),
+              );
             },
           ),
         ],
@@ -201,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
           var password = env['PASSWORD'];
 
           if (username != null && password != null) {
-            utils.getUsage(username, password);
+            getUsage(username, password);
           }
         },
         tooltip: 'Refresh',
