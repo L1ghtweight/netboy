@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:html/parser.dart' as html;
 import 'package:requests/requests.dart';
 
@@ -24,10 +23,12 @@ Future<String> getUsage(String username, String password) async {
       verify: true,
     );
 
-    int usageMinutes = getParsedUsage(response.content());
-
-    print(usageMinutes);
-    return usageMinutes.toString();
+    var usageMinutes = getParsedUsage(response.content()).toString();
+    if (usageMinutes == "-1") {
+      usageMinutes = "Error 404!";
+    }
+    print('$username: $usageMinutes');
+    return usageMinutes;
   } on Exception catch (e) {
     print("Request Exception: $e");
     rethrow;
