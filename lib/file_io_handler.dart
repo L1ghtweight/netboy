@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 Future<void> appendToCredsFile(String id, String password) async {
@@ -28,7 +27,7 @@ Future<void> appendToCredsFile(String id, String password) async {
   }
 }
 
-Future<List<List<String>>> getCredsData() async {
+List<List<String>> getCredsData() {
   List<List<String>> credentials=[
     ['arsawerw', 'qerqfv32423'],
     ['arsawerw', 'qerqfv32423'],

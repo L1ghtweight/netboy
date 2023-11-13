@@ -11,7 +11,7 @@ class CredentialsManager extends StatefulWidget {
 }
 
 class _CredentialsManagerState extends State<CredentialsManager> {
-  List<List<String>> data = getCredsData() as List<List<String>>;
+  List<List<String>> credsData = getCredsData();
   void showAddIDDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -20,7 +20,7 @@ class _CredentialsManagerState extends State<CredentialsManager> {
         TextEditingController passwordController = TextEditingController();
 
         return AlertDialog(
-          title: const Text('Add New User'),
+          title: const Text('Add New Net ID'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -56,10 +56,70 @@ class _CredentialsManagerState extends State<CredentialsManager> {
                 // Append to the creds.json file
                 appendToCredsFile(id, password);
 
+                setState(() {
+                  credsData.add([id, password]);
+                });
+
                 // Close the dialog box
                 Navigator.pop(context);
               },
               child: const Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void editCredsDialog(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController idController =
+            TextEditingController(text: credsData[index][0]);
+        TextEditingController passwordController =
+            TextEditingController(text: credsData[index][1]);
+
+        return AlertDialog(
+          title: const Text('Edit Net ID'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: idController,
+                decoration: const InputDecoration(
+                  hintText: 'Enter ID',
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: passwordController,
+                decoration: const InputDecoration(
+                  hintText: 'Enter Password',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog box
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Process the entered ID and password
+                String id = idController.text;
+                String password = passwordController.text;
+                setState(() {
+                  credsData[index] = [id, password];
+                });
+
+                // Close the dialog box
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
             ),
           ],
         );
@@ -73,27 +133,19 @@ class _CredentialsManagerState extends State<CredentialsManager> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit_note_outlined),
-            tooltip: 'Edit',
-            onPressed: () {
-              // Add button functionality here
-            },
-          ),
-        ],
+        actions: const [],
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             DataTable(
-              columns: [
+              columns: const [
                 DataColumn(label: Text('Net ID')),
                 DataColumn(label: Text('Password')),
                 DataColumn(label: Text('     ')),
               ],
-              rows: data
+              rows: credsData
                   .asMap()
                   .entries
                   .map(
@@ -108,7 +160,8 @@ class _CredentialsManagerState extends State<CredentialsManager> {
                               // Handle edit button click
                               // Pass the index of the pressed row
                               print(entry.key);
-                              print(data[entry.key]);
+                              print(credsData[entry.key]);
+                              editCredsDialog(context, entry.key);
                             },
                           ),
                         ),
