@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:html/parser.dart' as html;
 import 'package:requests/requests.dart';
 
@@ -25,7 +27,7 @@ Future<String> getUsage(String username, String password) async {
 
     var usageMinutes = getParsedUsage(response.content()).toString();
     if (usageMinutes == "-1") {
-      usageMinutes = "Error 404!";
+      usageMinutes = "Couldn't fetch.";
     }
     print('$username: $usageMinutes');
     return usageMinutes;
@@ -60,14 +62,14 @@ int getParsedUsage(String body) {
 
 Future<List<List<String>>> getUserUsageData() async {
   List<List<String>> credentials = await readCredsFile();
-  List<List<String>> usageData = [];
+  List<Future<List<String>>> futures = [];
+
   for (var credential in credentials) {
     var username = credential[0];
     var password = credential[1];
-    var usage = await getUsage(username, password);
-    if (usageData.contains([username, usage]) == false) {
-      usageData.add([username, usage]);
-    }
+    futures
+        .add(getUsage(username, password).then((usage) => [username, usage]));
   }
-  return usageData;
+
+  return Future.wait(futures);
 }
