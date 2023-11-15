@@ -5,7 +5,8 @@ import 'package:requests/requests.dart';
 
 import 'file_io_handler.dart';
 
-Future<String> getUsage(String username, String password) async {
+Future<List<String>> getUsage(String username, String password) async {
+  print("Call for: $username");
   const loginUrl = "http://10.220.20.12/index.php/home/loginProcess";
   final payload = {'username': username, 'password': password};
   final headers = {"Content-Type": "application/x-www-form-urlencoded"};
@@ -29,8 +30,9 @@ Future<String> getUsage(String username, String password) async {
     if (usageMinutes == "-1") {
       usageMinutes = "Couldn't fetch.";
     }
+
     print('$username: $usageMinutes');
-    return usageMinutes;
+    return [username, usageMinutes];
   } on Exception catch (e) {
     print("Request Exception: $e");
     rethrow;
@@ -65,10 +67,7 @@ Future<List<List<String>>> getUserUsageData() async {
   List<Future<List<String>>> futures = [];
 
   for (var credential in credentials) {
-    var username = credential[0];
-    var password = credential[1];
-    futures
-        .add(getUsage(username, password).then((usage) => [username, usage]));
+    futures.add(getUsage(credential[0], credential[1]));
   }
 
   return Future.wait(futures);

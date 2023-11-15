@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'utils.dart';
 import 'credentials_manager.dart';
+import 'test.dart' as test;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +46,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> fetchUsageData() async {
-    List<List<String>> data = await getUserUsageData();
+    Stopwatch stopwatch = Stopwatch()..start();
+
+    List<List<String>> data = await test.threadedCalls();
+    stopwatch.stop();
+    print("Fetched in: ${stopwatch.elapsed.inMilliseconds}");
+
+    print("setting data");
     print(data);
     setState(() {
       usageData = data;
