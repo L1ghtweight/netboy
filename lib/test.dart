@@ -2,12 +2,11 @@ import 'dart:async';
 
 import 'package:html/parser.dart' as html;
 import 'package:http/http.dart' as http;
-import 'package:requests/requests.dart';
 
 var users = [
   ["", ""],
   ["", ""],
-  ["", ""]
+  ["", ""],
 ];
 
 void main() async {
@@ -75,40 +74,54 @@ Future<List<List<String>>> threadedCalls() {
 
 Future<List<String>> getUsage(String username, String password) async {
   print("Call for: $username");
+
   const loginUrl = "http://10.220.20.12/index.php/home/loginProcess";
   final payload = {'username': username, 'password': password};
-  final headers = {"Content-Type": "application/x-www-form-urlencoded"};
 
   try {
-    var response = await Requests.post(
-      loginUrl,
-      headers: headers,
+    final headers0 = {"Content-Type": "application/x-www-form-urlencoded"};
+
+    final client = http.Client(); // Create a new client for each call
+
+    var response0 = await client.post(
+      Uri.parse(loginUrl), 
+      headers: headers0, 
+      body: payload
+    );
+    var cookie = response0.headers['set-cookie'];
+    print(cookie);
+
+    final headers1 = {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "cookie": cookie!
+    };
+    var response1 = await client.post(
+      Uri.parse(loginUrl),
+      headers: headers1,
       body: payload,
-      verify: true,
     );
 
-    response = await Requests.post(
-      loginUrl,
-      headers: headers,
-      body: payload,
-      verify: true,
-    );
+    print(
+        '***************################################### got response for id $username : ');
 
-    var usageMinutes = getParsedUsage(response.content()).toString();
+    var usageMinutes = getParsedUsage(response1.body).toString();
     if (usageMinutes == "-1") {
-      usageMinutes = "Couldn't fetch.";
+      usageMinutes = "Error 404!";
     }
-
     print('$username: $usageMinutes');
+    client.close(); // Close the client after request completion
     return [username, usageMinutes];
-  } on Exception catch (e) {
+  } catch (e) {
     print("Request Exception: $e");
     rethrow;
   }
 }
 
 int getParsedUsage(String body) {
+  print(body);
   final document = html.parse(body);
+  print(document.toString());
+
   final table = document.querySelector("table.table.invoicefor");
   final tableBody = table?.querySelector("tbody");
   final rows = tableBody?.querySelectorAll("tr");
@@ -131,13 +144,13 @@ int getParsedUsage(String body) {
 }
 
 Future<List<List<String>>> getUserUsageData() async {
-  List<Future<List<String>>> futures = [];
+  List<Future<List<String>>> usageData = [];
 
   for (var credential in users) {
     var username = credential[0];
     var password = credential[1];
-    futures.add(getUsage(username, password));
+    usageData.add(getUsage(username, password));
   }
 
-  return Future.wait(futures);
+  return Future.wait(usageData);
 }
