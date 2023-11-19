@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:netboy/utils.dart';
 
 import 'credentials_manager.dart';
-import 'test.dart' as test;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> fetchUsageData() async {
     Stopwatch stopwatch = Stopwatch()..start();
 
-    List<List<String>> data = await test.threadedCalls();
+    List<List<String>> data = await getUserUsageData();
     stopwatch.stop();
     print("Fetched in: ${stopwatch.elapsed.inMilliseconds}");
 
