@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:netboy/utils.dart';
 
-import 'utils.dart';
 import 'credentials_manager.dart';
 
 void main() async {
@@ -46,7 +46,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> fetchUsageData() async {
+    Stopwatch stopwatch = Stopwatch()..start();
+
     List<List<String>> data = await getUserUsageData();
+    stopwatch.stop();
+    print("Fetched in: ${stopwatch.elapsed.inMilliseconds}");
+
+    print("setting data");
     print(data);
     setState(() {
       usageData = data;
