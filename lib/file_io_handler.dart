@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+
+// import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 Future<void> updateCredsFile(List<List<String>> updatedCreds) async {
@@ -14,6 +16,11 @@ Future<void> updateCredsFile(List<List<String>> updatedCreds) async {
 
   // Write the updated data to the file
   credsFile.writeAsStringSync(json.encode(jsonData));
+
+  // final snackBar = SnackBar(
+  //   content: Text('User added!'),
+  // );
+  // ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
 Future<List<List<String>>> readCredsFile() async {
