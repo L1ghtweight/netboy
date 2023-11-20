@@ -11,9 +11,7 @@ Future<List<String>> getUsage(String username, String password) async {
 
   try {
     final headers0 = {"Content-Type": "application/x-www-form-urlencoded"};
-
     final client = http.Client(); // Create a new client for each call
-
     var response0 = await client.post(Uri.parse(loginUrl),
         headers: headers0, body: payload);
     var cookie = response0.headers['set-cookie'];
@@ -30,7 +28,7 @@ Future<List<String>> getUsage(String username, String password) async {
 
     var usageMinutes = getParsedUsage(response1.body).toString();
     if (usageMinutes == "-1") {
-      usageMinutes = "Error 404!";
+      usageMinutes = "Couldn't fetch";
     }
     client.close(); // Close the client after request completion
     return [username, usageMinutes];

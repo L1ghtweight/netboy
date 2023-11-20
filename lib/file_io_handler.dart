@@ -16,11 +16,6 @@ Future<void> updateCredsFile(List<List<String>> updatedCreds) async {
 
   // Write the updated data to the file
   credsFile.writeAsStringSync(json.encode(jsonData));
-
-  // final snackBar = SnackBar(
-  //   content: Text('User added!'),
-  // );
-  // ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
 Future<List<List<String>>> readCredsFile() async {

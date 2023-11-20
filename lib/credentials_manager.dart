@@ -194,7 +194,11 @@ class _CredentialsManagerState extends State<CredentialsManager> {
                     (entry) => DataRow(
                       cells: [
                         DataCell(Text(entry.value[0])),
-                        DataCell(Text(entry.value[1])),
+                        DataCell(
+                          Text(entry.value[1] == '*******'
+                              ? '*******'
+                              : '*******'),
+                        ),
                         DataCell(
                           IconButton(
                             icon: const Icon(Icons.edit),

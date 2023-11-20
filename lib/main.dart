@@ -42,18 +42,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    // fetchUsageData();
   }
 
   Future<void> fetchUsageData() async {
-    Stopwatch stopwatch = Stopwatch()..start();
-
     List<List<String>> data = await getUserUsageData();
-    stopwatch.stop();
-    print("Fetched in: ${stopwatch.elapsed.inMilliseconds}");
-
-    print("setting data");
-    print(data);
     setState(() {
       usageData = data;
       isDataFetched = true;
