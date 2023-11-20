@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'file_io_handler.dart';
+import 'ui_components.dart' as ui;
 
 class CredentialsManager extends StatefulWidget {
   const CredentialsManager({super.key, required this.title});
@@ -66,17 +68,26 @@ class _CredentialsManagerState extends State<CredentialsManager> {
                 String id = idController.text;
                 String password = passwordController.text;
 
-                // Append to the creds.json file
+                String snackBarMessage = "Added user";
 
                 setState(() {
-                  if (credsData.contains([id, password]) == false) {
+                  bool duplicate = credsData.any((sublist) =>
+                      sublist.contains(id) && sublist.contains(password));
+
+                  if (!duplicate) {
                     credsData.add([id, password]);
+                    updateCredsFile(credsData);
+                  } else {
+                    snackBarMessage = "User already exists";
                   }
                 });
 
-                updateCredsFile(credsData);
                 // Close the dialog box
                 Navigator.pop(context);
+
+                // show the snackbar
+                final snackBar = ui.getSnackbar(snackBarMessage);
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
               },
               child: const Text('Add'),
             ),
@@ -120,8 +131,12 @@ class _CredentialsManagerState extends State<CredentialsManager> {
               onPressed: () {
                 setState(() {
                   credsData.removeAt(_index);
+                  updateCredsFile(credsData);
+                  // show the snackbar
+                  String snackBarMessage = "Removed user";
+                  final snackBar = ui.getSnackbar(snackBarMessage);
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 });
-                updateCredsFile(credsData);
                 Navigator.pop(context); // Close the dialog box
               },
               child: const Text('Remove'),
@@ -184,10 +199,6 @@ class _CredentialsManagerState extends State<CredentialsManager> {
                           IconButton(
                             icon: const Icon(Icons.edit),
                             onPressed: () {
-                              // Handle edit button click
-                              // Pass the index of the pressed row
-                              print(entry.key);
-                              print(credsData[entry.key]);
                               editCredsDialog(context, entry.key);
                             },
                           ),

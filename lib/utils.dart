@@ -6,8 +6,6 @@ import 'package:http/http.dart' as http;
 import 'file_io_handler.dart';
 
 Future<List<String>> getUsage(String username, String password) async {
-  print("Call for: $username");
-
   const loginUrl = "http://10.220.20.12/index.php/home/loginProcess";
   final payload = {'username': username, 'password': password};
 
@@ -16,13 +14,9 @@ Future<List<String>> getUsage(String username, String password) async {
 
     final client = http.Client(); // Create a new client for each call
 
-    var response0 = await client.post(
-      Uri.parse(loginUrl), 
-      headers: headers0, 
-      body: payload
-    );
+    var response0 = await client.post(Uri.parse(loginUrl),
+        headers: headers0, body: payload);
     var cookie = response0.headers['set-cookie'];
-    print(cookie);
 
     final headers1 = {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -34,18 +28,13 @@ Future<List<String>> getUsage(String username, String password) async {
       body: payload,
     );
 
-    print(
-        '***************################################### got response for id $username : ');
-
     var usageMinutes = getParsedUsage(response1.body).toString();
     if (usageMinutes == "-1") {
       usageMinutes = "Error 404!";
     }
-    print('$username: $usageMinutes');
     client.close(); // Close the client after request completion
     return [username, usageMinutes];
   } catch (e) {
-    print("Request Exception: $e");
     rethrow;
   }
 }
