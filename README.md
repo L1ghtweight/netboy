@@ -1,5 +1,6 @@
 # netboy
 A simple application to track internet usage at IUT
+
 Offspring of [netman](https://github.com/L1ghtweight/netman)
 
 ### Features:
